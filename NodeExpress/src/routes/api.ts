@@ -2,7 +2,7 @@ import express from "express";
 import WebSocket from "ws";
 import {expressWsApp} from "../appInit";
 import {pick} from "lodash";
-import {CallProcess} from "../controller/processController";
+import {CallProcess, CallProcessState} from "../controller/processController";
 
 const showData: string[] = [
     'binaryType',
@@ -81,20 +81,29 @@ router.ws('/', (ws, req, next) => {
         },
         error => {
             console.log(error);
-        },
-        () => {
-            console.log('close');
-            if (ws.readyState !== WebSocket.CLOSED)
-                ws.close();
         });
+    cp.state.subscribe(value => {
+        switch (value) {
+            case CallProcessState.complete:
+                console.log('CallProcess closed');
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send('$#close');
+                }
+                return;
+            case CallProcessState.error:
+                return;
+        }
+    });
 
     ws.on("close", function (code: number, reason: string) {
         console.log("====================================");
         console.log("close.");
+        console.log(code, reason);
         console.log(pick(this, showData));
         console.log("++++++++++++++++++++++++++++++++++++");
 
         cp.stop();
+        cp.destroy();
     });
 
 });

@@ -16,6 +16,9 @@
         socket.addEventListener('message', function (event) {
             console.log('Message from server ', event.data);
             // socket.close();
+            if (event.data === '$#close') {
+                socket.close();
+            }
         });
     </script>
 </head>
