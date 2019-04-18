@@ -59,11 +59,20 @@ function onError(error: any) {
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-console.log('Listening on port ' + port);
+// console.log('Listening on port ' + port);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-app.listen(port);
-app.on('error', onError);
+const server = app.listen(port);
+// app.on('error', onError);
+
+server.on('error', onError);
+server.on('listening', () => {
+    let addr: any = server.address();
+    let bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    console.log('Listening on ' + bind);
+});
