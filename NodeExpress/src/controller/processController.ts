@@ -29,11 +29,10 @@ export class CallProcess {
         this.childProcess.kill();
     }
 
-    constructor() {
+    constructor(args?: ReadonlyArray<string>) {
         this.childProcess = child_process.spawn(
             './exec/BaiduPCS-Go-v3.5.6-windows-x64/BaiduPCS-Go.exe',
-            ['ll', '--desc', '--time'],
-            // {maxBuffer: ''}
+            args || ['ls', '--desc', '--time'],
         );
 
         this.childProcess.stdout.setEncoding('utf8');
